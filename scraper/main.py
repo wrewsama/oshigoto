@@ -14,5 +14,4 @@ if __name__ == '__main__':
 
     nodeflairScraper = scraper.NodeFlairScraper(driver=driver)
     nodeflairScraper.search('software engineer intern')
-
-
+    res = nodeflairScraper.getBasicInfo()
