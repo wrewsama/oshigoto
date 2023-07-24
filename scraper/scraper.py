@@ -1,4 +1,6 @@
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from abc import ABC, abstractmethod
@@ -6,8 +8,8 @@ from abc import ABC, abstractmethod
 class Scraper(ABC):
 
     @abstractmethod
-    def __init__(self, driver: webdriver.Chrome):
-        self.driver = driver
+    def __init__(self, options: Options, service: Service):
+        self.driver
         self.listings
 
     @abstractmethod
@@ -22,14 +24,20 @@ class Scraper(ABC):
     def getBasicInfo(self):
         pass
 
+    @abstractmethod
+    def getJobPoints(self):
+        pass
+
 class NodeFlairScraper(Scraper):
-    def __init__(self, driver:webdriver.Chrome):
-        self.driver = driver
+    def __init__(self, options: Options, service: Service):
+        self.driver = webdriver.Chrome(service=service,
+                                options=options)
+        self.driver.set_window_size(1280, 720)
         self.driver.get("https://nodeflair.com/jobs?countries%5B%5D=Singapore")
+        self.driver.implicitly_wait(10)
         self.listings = self._getListings()
 
     def _getListings(self):
-        self.driver.implicitly_wait(5)
         return self.driver.find_elements(By.XPATH, "//div[@class='jobListingCard-0-3-69 ']")
     
     def search(self, query:str):
@@ -52,4 +60,16 @@ class NodeFlairScraper(Scraper):
                 "link": link
             })
         
+        return res
+
+    def getJobPoints(self):
+        res = []
+        def getCurrJobPoints():
+            pts = self.driver.find_elements(By.XPATH, "//div[@class='jobDescriptionContent-0-3-110']//li")
+            return list(map(lambda x: x.text, pts))
+
+        for listing in self.listings:
+            listing.click()
+            res.extend(getCurrJobPoints())
+
         return res
