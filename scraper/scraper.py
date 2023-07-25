@@ -34,7 +34,7 @@ class NodeFlairScraper(Scraper):
         self.driver = webdriver.Chrome(service=service,
                                 options=options)
         self.driver.set_window_size(1280, 720)
-        self.driver.get("https://nodeflair.com/jobs?countries%5B%5D=Singapore")
+        self.driver.get("https://nodeflair.com/jobs")
         self.driver.implicitly_wait(10)
         self.listings = self._getListings()
 
@@ -80,7 +80,7 @@ class LinkedinScraper(Scraper):
         self.driver = webdriver.Chrome(service=service,
                                 options=options)
         self.driver.set_window_size(1280, 720)
-        self.driver.get("https://www.linkedin.com/jobs/search/")
+        self.driver.get("https://www.linkedin.com/jobs/search")
         self.driver.implicitly_wait(10)
         self._changeCountry()
         self.listings = self._getListings()
