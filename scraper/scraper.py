@@ -73,3 +73,26 @@ class NodeFlairScraper(Scraper):
             res.extend(getCurrJobPoints())
 
         return res
+
+class LinkedinScraper(Scraper):
+    def __init__(self, options: Options, service: Service):
+        self.driver = webdriver.Chrome(service=service,
+                                options=options)
+        self.driver.set_window_size(1280, 720)
+        self.driver.get("https://www.linkedin.com/jobs/search/")
+        self.driver.implicitly_wait(10)
+        countrySearchBar = self.driver.find_element(By.XPATH, "//input[@id='job-search-bar-location']")
+        countrySearchBar.send_keys('Singapore')
+        self.listings = self._getListings()
+
+    def _getListings(self):
+        return self.driver.find_elements(By.XPATH, "//a[@class='base-card__full-link absolute top-0 right-0 bottom-0 left-0 p-0 z-[2]']")
+    
+    def search(self, query:str):
+        pass
+
+    def getBasicInfo(self):
+        pass
+
+    def getJobPoints(self):
+        pass

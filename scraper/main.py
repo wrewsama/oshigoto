@@ -7,11 +7,17 @@ import scraper
 if __name__ == '__main__':
     globalOptions = Options()
     globalOptions.add_experimental_option("detach", True)
-    globalService = Service(ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install())
-    nodeflairScraper = scraper.NodeFlairScraper(options=globalOptions, service=globalService)
+    globalService = Service(
+        ChromeDriverManager(
+            chrome_type=ChromeType.CHROMIUM,
+            version='114.0.5735.90').install())
 
-    nodeflairScraper.search('software engineer intern')
-    basicInfo = nodeflairScraper.getBasicInfo()
-    jobPoints = nodeflairScraper.getJobPoints()
-    print(f"BASIC INFO: {basicInfo}")
-    print(f"JOB POINTS: {jobPoints}")
+    nodeflairScraper = scraper.NodeFlairScraper(options=globalOptions, service=globalService)
+    # nodeflairScraper.search('software engineer intern')
+    # basicInfo = nodeflairScraper.getBasicInfo()
+    # jobPoints = nodeflairScraper.getJobPoints()
+    # print(f"BASIC INFO: {basicInfo}")
+    # print(f"JOB POINTS: {jobPoints}")
+
+    linkedinScraper = scraper.LinkedinScraper(options=globalOptions, service=globalService)
+    print(linkedinScraper._getListings())
