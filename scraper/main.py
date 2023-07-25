@@ -20,4 +20,4 @@ if __name__ == '__main__':
     # print(f"JOB POINTS: {jobPoints}")
 
     linkedinScraper = scraper.LinkedinScraper(options=globalOptions, service=globalService)
-    print(linkedinScraper._getListings())
+    linkedinScraper.search("software engineer intern")

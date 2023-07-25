@@ -5,6 +5,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from abc import ABC, abstractmethod
 
+# TODO: set up method to change the country
 class Scraper(ABC):
 
     @abstractmethod
@@ -81,15 +82,23 @@ class LinkedinScraper(Scraper):
         self.driver.set_window_size(1280, 720)
         self.driver.get("https://www.linkedin.com/jobs/search/")
         self.driver.implicitly_wait(10)
-        countrySearchBar = self.driver.find_element(By.XPATH, "//input[@id='job-search-bar-location']")
-        countrySearchBar.send_keys('Singapore')
+        self._changeCountry()
         self.listings = self._getListings()
+    
+    def _changeCountry(self):
+        countrySearchBar = self.driver.find_element(By.XPATH, "//input[@id='job-search-bar-location']")
+        for _ in range(13):
+            countrySearchBar.send_keys(Keys.BACKSPACE)
+        countrySearchBar.send_keys('Singapore')
 
     def _getListings(self):
         return self.driver.find_elements(By.XPATH, "//a[@class='base-card__full-link absolute top-0 right-0 bottom-0 left-0 p-0 z-[2]']")
     
     def search(self, query:str):
-        pass
+        searchBar = self.driver.find_element(By.XPATH, "//input[@id='job-search-bar-keywords']")
+        searchBar.send_keys(query) 
+        searchBar.send_keys(Keys.RETURN)
+        self.listings = self._getListings()
 
     def getBasicInfo(self):
         pass
