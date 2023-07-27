@@ -13,11 +13,13 @@ if __name__ == '__main__':
             version='114.0.5735.90').install())
 
     nodeflairScraper = scraper.NodeFlairScraper(options=globalOptions, service=globalService)
-    # nodeflairScraper.search('software engineer intern')
+    nodeflairScraper.setLocation('Singapore')
+    nodeflairScraper.search('software engineer intern')
     # basicInfo = nodeflairScraper.getBasicInfo()
     # jobPoints = nodeflairScraper.getJobPoints()
     # print(f"BASIC INFO: {basicInfo}")
     # print(f"JOB POINTS: {jobPoints}")
 
     linkedinScraper = scraper.LinkedinScraper(options=globalOptions, service=globalService)
+    linkedinScraper.setLocation("india")
     linkedinScraper.search("software engineer intern")

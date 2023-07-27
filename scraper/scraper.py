@@ -18,6 +18,10 @@ class Scraper(ABC):
         pass
 
     @abstractmethod
+    def setLocation(self, location: str):
+        pass
+
+    @abstractmethod
     def search(self, query: str):
         pass
 
@@ -38,8 +42,15 @@ class NodeFlairScraper(Scraper):
         self.driver.implicitly_wait(10)
         self.listings = self._getListings()
 
+        self.VALID_COUNTRIES = {'Singapore', 'Malaysia', 'Phillipines', 'Indonesia', 'Vietnam', 'Thailand', 'Taiwan', 'India'}
+
     def _getListings(self):
         return self.driver.find_elements(By.XPATH, "//div[@class='jobListingCard-0-3-69 ']")
+    
+    def setLocation(self, location: str):
+        if location.title() not in self.VALID_COUNTRIES:
+            return 
+        self.driver.get(f"https://nodeflair.com/jobs?query=&page=1&sort_by=relevant&countries%5B%5D={location.title()}")
     
     def search(self, query:str):
         print(f'[INFO] search started with {query}')
@@ -82,17 +93,17 @@ class LinkedinScraper(Scraper):
         self.driver.set_window_size(1280, 720)
         self.driver.get("https://www.linkedin.com/jobs/search")
         self.driver.implicitly_wait(10)
-        self._changeCountry()
         self.listings = self._getListings()
-    
-    def _changeCountry(self):
-        countrySearchBar = self.driver.find_element(By.XPATH, "//input[@id='job-search-bar-location']")
-        for _ in range(13):
-            countrySearchBar.send_keys(Keys.BACKSPACE)
-        countrySearchBar.send_keys('Singapore')
 
     def _getListings(self):
         return self.driver.find_elements(By.XPATH, "//a[@class='base-card__full-link absolute top-0 right-0 bottom-0 left-0 p-0 z-[2]']")
+
+    def setLocation(self, location: str):
+        countrySearchBar = self.driver.find_element(By.XPATH, "//input[@id='job-search-bar-location']")
+        for _ in range(13):
+            countrySearchBar.send_keys(Keys.BACKSPACE)
+        countrySearchBar.send_keys(location)
+
     
     def search(self, query:str):
         searchBar = self.driver.find_element(By.XPATH, "//input[@id='job-search-bar-keywords']")
