@@ -96,7 +96,10 @@ class LinkedinScraper(Scraper):
         self.listings = self._getListings()
 
     def _getListings(self):
-        return self.driver.find_elements(By.XPATH, "//a[@class='base-card__full-link absolute top-0 right-0 bottom-0 left-0 p-0 z-[2]']")
+        activeListing = self.driver.find_element(By.XPATH, "//div[@class='base-card relative w-full hover:no-underline focus:no-underline base-card--link base-search-card base-search-card--link job-search-card job-search-card--active']")
+        otherListings = self.driver.find_elements(By.XPATH, "//div[@class='base-card relative w-full hover:no-underline focus:no-underline base-card--link base-search-card base-search-card--link job-search-card']")
+        return [activeListing, *otherListings]
+
 
     def setLocation(self, location: str):
         countrySearchBar = self.driver.find_element(By.XPATH, "//input[@id='job-search-bar-location']")
@@ -112,7 +115,17 @@ class LinkedinScraper(Scraper):
         self.listings = self._getListings()
 
     def getBasicInfo(self):
-        pass
+        res = []
+        for listing in self.listings:
+            title = listing.find_element(By.XPATH, ".//h3[@class='base-search-card__title']").text
+            company = listing.find_element(By.XPATH, ".//h4[@class='base-search-card__subtitle']").text 
+            link = listing.find_element(By.XPATH, "./a").get_attribute("href")
+            res.append({
+                "title": title,
+                "company": company,
+                "link": link
+            })
+        return res
 
     def getJobPoints(self):
         pass

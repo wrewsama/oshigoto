@@ -12,14 +12,16 @@ if __name__ == '__main__':
             chrome_type=ChromeType.CHROMIUM,
             version='114.0.5735.90').install())
 
-    nodeflairScraper = scraper.NodeFlairScraper(options=globalOptions, service=globalService)
-    nodeflairScraper.setLocation('Singapore')
-    nodeflairScraper.search('software engineer intern')
+    # nodeflairScraper = scraper.NodeFlairScraper(options=globalOptions, service=globalService)
+    # nodeflairScraper.setLocation('Singapore')
+    # nodeflairScraper.search('software engineer intern')
     # basicInfo = nodeflairScraper.getBasicInfo()
     # jobPoints = nodeflairScraper.getJobPoints()
     # print(f"BASIC INFO: {basicInfo}")
     # print(f"JOB POINTS: {jobPoints}")
 
     linkedinScraper = scraper.LinkedinScraper(options=globalOptions, service=globalService)
-    linkedinScraper.setLocation("india")
+    linkedinScraper.setLocation("Singapore")
     linkedinScraper.search("software engineer intern")
+    lbasicinfo = linkedinScraper.getBasicInfo()
+    print(lbasicinfo)
