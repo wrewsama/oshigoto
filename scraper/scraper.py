@@ -1,4 +1,5 @@
 from selenium import webdriver
+from selenium.common.exceptions import ElementClickInterceptedException
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
@@ -136,7 +137,7 @@ class GlintsScraper(Scraper):
     def __init__(self, options: Options, service: Service):
         self.driver = webdriver.Chrome(service=service,
                                 options=options)
-        self.driver.set_window_size(1280, 720)
+        self.driver.set_window_size(1280, 1080)
         self.driver.get("https://glints.com/sg/opportunities/jobs/explore?country=SG&locationName=All+Cities%2FProvinces&keyword=intern")
         self.driver.implicitly_wait(10)
         self.listings = self._getListings()
@@ -156,7 +157,12 @@ class GlintsScraper(Scraper):
                                 'United States'}
 
     def _getListings(self):
-        return self.driver.find_elements(By.XPATH, "//div[@class='JobCardsc__JobcardContainer-sc-hmqj50-0 kWccWU CompactOpportunityCardsc__CompactJobCardWrapper-sc-dkg8my-0 kwAlsu compact_job_card']")
+        def extractLink(listing):
+            return listing.find_element(By.XPATH, "./div/a").get_attribute('href')
+        sleep(2)
+        listingsWithoutLinks = self.driver.find_elements(By.XPATH, "//div[@class='JobCardsc__JobcardContainer-sc-hmqj50-0 kWccWU CompactOpportunityCardsc__CompactJobCardWrapper-sc-dkg8my-0 kwAlsu compact_job_card']")[:10]
+        sleep(2)
+        return list(map(lambda l: [l, extractLink(l)], listingsWithoutLinks))
 
     def setLocation(self, location: str):
         if location not in self.VALID_COUNTRIES:
@@ -177,10 +183,11 @@ class GlintsScraper(Scraper):
 
     def getBasicInfo(self):
         res = []
-        for listing in self.listings:
+        for l in self.listings:
+            listing = l[0]
             title = listing.find_element(By.XPATH, ".//h3[@class='CompactOpportunityCardsc__JobTitle-sc-dkg8my-7 jJvzUD']").text
             company = listing.find_element(By.XPATH, ".//span[@class='CompactOpportunityCardsc__CompanyLinkContainer-sc-dkg8my-10 bPZqe']").text
-            link = listing.find_element(By.XPATH, "./div/a").get_attribute('href')
+            link = l[1]
             res.append({
                 "title": title,
                 "company": company,
@@ -190,4 +197,23 @@ class GlintsScraper(Scraper):
         return res
 
     def getJobPoints(self):
-        pass
+        res = []
+
+        def extractInfo():
+            readMoreBtn = self.driver.find_element(By.XPATH, "//button[contains(text(), 'Read More')]")
+            readMoreBtn.click()
+            desc = self.driver.find_element(By.XPATH, "//div[@class='public-DraftEditor-content']")
+            pts = desc.find_elements(By.XPATH, ".//li//span[@data-text='true']")
+            return list(map(lambda x: x.text, pts))
+
+        for l in self.listings:
+            link = l[1]
+            self.driver.get(link)
+            try:
+                res.extend(extractInfo())
+            except ElementClickInterceptedException:
+                # the popup is in the way lmao
+                print('skipped element')
+            self.driver.back()
+        
+        return res
