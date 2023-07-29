@@ -4,6 +4,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from abc import ABC, abstractmethod
+from time import sleep
 
 # TODO: set up method to change the country
 class Scraper(ABC):
@@ -128,4 +129,5 @@ class LinkedinScraper(Scraper):
         return res
 
     def getJobPoints(self):
-        pass
+        # linkedin blocks headless browsers / non logged in users from accessing JDs
+        return []

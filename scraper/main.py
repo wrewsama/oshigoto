@@ -20,8 +20,8 @@ if __name__ == '__main__':
     # print(f"BASIC INFO: {basicInfo}")
     # print(f"JOB POINTS: {jobPoints}")
 
-    linkedinScraper = scraper.LinkedinScraper(options=globalOptions, service=globalService)
-    linkedinScraper.setLocation("Singapore")
-    linkedinScraper.search("software engineer intern")
-    lbasicinfo = linkedinScraper.getBasicInfo()
-    print(lbasicinfo)
+    # linkedinScraper = scraper.LinkedinScraper(options=globalOptions, service=globalService)
+    # linkedinScraper.setLocation("Singapore")
+    # linkedinScraper.search("software engineer intern")
+    # # lbasicinfo = linkedinScraper.getBasicInfo()
+    # lJobPts = linkedinScraper.getJobPoints()
