@@ -137,7 +137,7 @@ class GlintsScraper(Scraper):
         self.driver = webdriver.Chrome(service=service,
                                 options=options)
         self.driver.set_window_size(1280, 720)
-        self.driver.get("https://glints.com/sg/jobs")
+        self.driver.get("https://glints.com/sg/opportunities/jobs/explore?country=SG&locationName=All+Cities%2FProvinces&keyword=intern")
         self.driver.implicitly_wait(10)
         self.listings = self._getListings()
 
@@ -169,7 +169,9 @@ class GlintsScraper(Scraper):
         selectedCountry.click()
     
     def search(self, query:str):
-        pass
+        url = self.driver.current_url
+        currSearchQueryIdx = url.index('&keyword=') + len('&keyword=')
+        self.driver.get(url[:currSearchQueryIdx] + query)
 
     def getBasicInfo(self):
         res = []
