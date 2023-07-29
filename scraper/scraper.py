@@ -156,7 +156,7 @@ class GlintsScraper(Scraper):
                                 'United States'}
 
     def _getListings(self):
-        pass
+        return self.driver.find_elements(By.XPATH, "//div[@class='JobCardsc__JobcardContainer-sc-hmqj50-0 kWccWU CompactOpportunityCardsc__CompactJobCardWrapper-sc-dkg8my-0 kwAlsu compact_job_card']")
 
     def setLocation(self, location: str):
         if location not in self.VALID_COUNTRIES:
@@ -173,10 +173,20 @@ class GlintsScraper(Scraper):
         currSearchQueryIdx = url.index('&keyword=') + len('&keyword=')
         self.driver.get(url[:currSearchQueryIdx] + query)
 
+        self.listings = self._getListings()
+
     def getBasicInfo(self):
         res = []
         for listing in self.listings:
-            continue
+            title = listing.find_element(By.XPATH, ".//h3[@class='CompactOpportunityCardsc__JobTitle-sc-dkg8my-7 jJvzUD']").text
+            company = listing.find_element(By.XPATH, ".//span[@class='CompactOpportunityCardsc__CompanyLinkContainer-sc-dkg8my-10 bPZqe']").text
+            link = listing.find_element(By.XPATH, "./div/a").get_attribute('href')
+            res.append({
+                "title": title,
+                "company": company,
+                "link": link
+            })
+
         return res
 
     def getJobPoints(self):

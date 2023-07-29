@@ -29,3 +29,5 @@ if __name__ == '__main__':
     glintsScraper = scraper.GlintsScraper(options=globalOptions, service=globalService)
     glintsScraper.search("Software engineer intern")
     glintsScraper.setLocation('India')
+    gBasicInfo = glintsScraper.getBasicInfo()
+    print(gBasicInfo)
