@@ -131,3 +131,51 @@ class LinkedinScraper(Scraper):
     def getJobPoints(self):
         # linkedin blocks headless browsers / non logged in users from accessing JDs
         return []
+
+class GlintsScraper(Scraper):
+    def __init__(self, options: Options, service: Service):
+        self.driver = webdriver.Chrome(service=service,
+                                options=options)
+        self.driver.set_window_size(1280, 720)
+        self.driver.get("https://glints.com/sg/jobs")
+        self.driver.implicitly_wait(10)
+        self.listings = self._getListings()
+
+        self.VALID_COUNTRIES = {'Singapore',
+                                'Malaysia',
+                                'Phillipines',
+                                'Indonesia',
+                                'Vietnam',
+                                'Thailand',
+                                'Taiwan',
+                                'India',
+                                'Hong Kong',
+                                'China',
+                                'Japan',
+                                'Australia',
+                                'United States'}
+
+    def _getListings(self):
+        pass
+
+    def setLocation(self, location: str):
+        if location not in self.VALID_COUNTRIES:
+            return
+
+        countryInput = self.driver.find_element(By.XPATH, "//div[@class='SelectStyle__SelectWrapper-sc-gv8n2w-1 driwsF select-inputwrapper']")
+        countryInput.click()
+        countrySelect = self.driver.find_element(By.XPATH, "//ul[@class='SelectStyle__SelectListWrapper-sc-gv8n2w-4 hNAXQP select-listbox']")
+        selectedCountry = countrySelect.find_element(By.XPATH, f".//li[contains(text(), '{location}')]")
+        selectedCountry.click()
+    
+    def search(self, query:str):
+        pass
+
+    def getBasicInfo(self):
+        res = []
+        for listing in self.listings:
+            continue
+        return res
+
+    def getJobPoints(self):
+        pass

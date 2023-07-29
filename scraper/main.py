@@ -25,3 +25,6 @@ if __name__ == '__main__':
     # linkedinScraper.search("software engineer intern")
     # # lbasicinfo = linkedinScraper.getBasicInfo()
     # lJobPts = linkedinScraper.getJobPoints()
+
+    glintsScraper = scraper.GlintsScraper(options=globalOptions, service=globalService)
+    glintsScraper.setLocation('India')
