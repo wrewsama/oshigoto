@@ -217,3 +217,56 @@ class GlintsScraper(Scraper):
             self.driver.back()
         
         return res
+
+class InternSgScraper(Scraper):
+    def __init__(self, options: Options, service: Service):
+        self.driver = webdriver.Chrome(service=service,
+                                options=options)
+        self.driver.set_window_size(1280, 720)
+        self.driver.get("https://www.internsg.com/jobs/")
+        self.driver.implicitly_wait(10)
+        self.listings = self._getListings()
+
+    def _getListings(self):
+        evenListings = self.driver.find_elements(By.XPATH, "//div[@class='ast-row list-even']")[:5]
+        oddListings = self.driver.find_elements(By.XPATH, "//div[@class='ast-row list-odd']")[:5]
+        return evenListings + oddListings
+
+
+    def setLocation(self, location: str):
+        pass
+    
+    def search(self, query:str):
+        searchBar = self.driver.find_element(By.XPATH, "//input[@class='form-control form-control-sm']")
+        searchBar.send_keys(query) 
+        searchBar.send_keys(Keys.RETURN)
+        self.listings = self._getListings()
+
+    def getBasicInfo(self):
+        res = []
+        for listing in self.listings:
+            title = listing.find_element(By.XPATH, "./div[2]/a").text
+            company = listing.find_element(By.XPATH, "./div[1]").text 
+            link = listing.find_element(By.XPATH, "./div[2]/a").get_attribute("href")
+            res.append({
+                "title": title,
+                "company": company,
+                "link": link
+            })
+        return res
+
+    def getJobPoints(self):
+        res = []
+
+        def extractInfo():
+            content = self.driver.find_element(By.XPATH, "//div[@class='isg-detail-container ast-row no-gutters']")
+            pts = content.find_elements(By.XPATH, ".//li")
+            parsedPts = list(map(lambda pt: pt.text, pts))
+            res.extend(parsedPts)
+
+        links = list(map(lambda l: l.find_element(By.XPATH, "./div[2]/a").get_attribute("href"), self.listings))
+        for link in links:
+            self.driver.get(link)
+            extractInfo()
+            self.driver.back()
+        return res
