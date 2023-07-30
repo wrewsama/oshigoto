@@ -7,7 +7,6 @@ from selenium.webdriver.common.keys import Keys
 from abc import ABC, abstractmethod
 from time import sleep
 
-# TODO: set up method to change the country
 class Scraper(ABC):
 
     @abstractmethod
