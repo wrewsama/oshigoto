@@ -270,3 +270,54 @@ class InternSgScraper(Scraper):
             extractInfo()
             self.driver.back()
         return res
+
+class GoogleScraper(Scraper):
+    def __init__(self, options: Options, service: Service):
+        self.driver = webdriver.Chrome(service=service,
+                                options=options)
+        self.driver.set_window_size(1280, 720)
+        self.driver.get("https://www.google.com/search?q=intern&oq=sof&gs_lcrp=EgZjaHJvbWUqBggBEEUYOzIGCAAQRRg5MgYIARBFGDsyBggCEEUYOzIbCAMQLhgUGK8BGMcBGIcCGIAEGJgFGJkFGJ4FMhAIBBAuGMcBGLEDGNEDGIAEMgYIBRBFGEEyBggGEEUYPDIGCAcQRRg80gEIMzkzNGowajSoAgCwAgA&sourceid=chrome&ie=UTF-8&ibp=htl;jobs&sa=X&ved=2ahUKEwjYisWp4bWAAxU03jgGHb7WBSQQutcGKAF6BAgQEAY&sxsrf=AB5stBgAC-3yVvfOy8LZiInlqREPBQWxKQ:1690697051757#fpstate=tldetail&htivrt=jobs&htidocid=PnKDBGYnYJAAAAAAAAAAAA%3D%3D")
+        self.driver.implicitly_wait(10)
+        self.listings = self._getListings()
+
+    def _getListings(self):
+        return self.driver.find_elements(By.XPATH, "//li[@class='iFjolb gws-plugins-horizon-jobs__li-ed']")
+    
+    def setLocation(self, location: str):
+        pass
+    
+    def search(self, query:str):
+        searchbar = self.driver.find_element(By.ID, "hs-qsb")
+        for _ in range(6):
+            searchbar.send_keys(Keys.BACK_SPACE)
+        searchbar.send_keys(query)
+        searchbar.send_keys(Keys.RETURN)
+
+        self.listings = self._getListings()
+
+    def getBasicInfo(self):
+        res = []
+        for listing in self.listings:
+            title = listing.find_element(By.XPATH, ".//div[@class='BjJfJf PUpOsf']").text
+            company = listing.find_element(By.XPATH, ".//div[@class='vNEEBe']").text
+            res.append({
+                "title": title,
+                "company": company,
+                "link": self.driver.current_url
+            })
+        
+        return res
+
+    def getJobPoints(self):
+        res = []
+        def getCurrJobPoints():
+            text = self.driver.find_element(By.XPATH, "//span[@class='HBvzbc']").get_attribute('innerText')
+            pts = text.split('\n')
+            pts = [pt[2:] for pt in pts if pt and pt[0] == '•']
+            return pts 
+
+        for listing in self.listings:
+            listing.click()
+            res.extend(getCurrJobPoints())
+
+        return res
