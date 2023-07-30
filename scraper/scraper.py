@@ -40,14 +40,15 @@ class NodeFlairScraper(Scraper):
         self.driver = webdriver.Chrome(service=service,
                                 options=options)
         self.driver.set_window_size(1280, 720)
-        self.driver.get("https://nodeflair.com/jobs")
+        self.driver.get("https://nodeflair.com/jobs?query=software+engineer+intern&page=1&sort_by=relevant&countries%5B%5D=Singapore")
         self.driver.implicitly_wait(10)
         self.listings = self._getListings()
 
         self.VALID_COUNTRIES = {'Singapore', 'Malaysia', 'Phillipines', 'Indonesia', 'Vietnam', 'Thailand', 'Taiwan', 'India'}
 
     def _getListings(self):
-        return self.driver.find_elements(By.XPATH, "//div[@class='jobListingCard-0-3-69 ']")
+        activeItem = self.driver.find_element(By.XPATH, "//div[@class='jobListingCard-0-3-79 outlinePrimary-0-3-80']")
+        return [activeItem] + self.driver.find_elements(By.XPATH, "//div[@class='jobListingCard-0-3-79 ']")
     
     def setLocation(self, location: str):
         if location.title() not in self.VALID_COUNTRIES:
@@ -55,7 +56,6 @@ class NodeFlairScraper(Scraper):
         self.driver.get(f"https://nodeflair.com/jobs?query=&page=1&sort_by=relevant&countries%5B%5D={location.title()}")
     
     def search(self, query:str):
-        print(f'[INFO] search started with {query}')
         searchbar = self.driver.find_element(By.XPATH, "//input[@class='react-autosuggest__input']")
         searchbar.send_keys(query)
         searchbar.send_keys(Keys.RETURN)
@@ -65,8 +65,8 @@ class NodeFlairScraper(Scraper):
     def getBasicInfo(self):
         res = []
         for listing in self.listings:
-            title = listing.find_element(By.XPATH, ".//h2[@class='jobListingCardTitle-0-3-72']").text
-            company = listing.find_element(By.XPATH, ".//p[@class='companynameAndRating-0-3-82']/span[1]").text
+            title = listing.find_element(By.XPATH, ".//h2[@class='jobListingCardTitle-0-3-82']").text
+            company = listing.find_element(By.XPATH, ".//p[@class='companynameAndRating-0-3-92']/span[1]").text
             link = listing.find_element(By.XPATH, "./a").get_attribute("href")
             res.append({
                 "title": title,
@@ -79,7 +79,7 @@ class NodeFlairScraper(Scraper):
     def getJobPoints(self):
         res = []
         def getCurrJobPoints():
-            pts = self.driver.find_elements(By.XPATH, "//div[@class='jobDescriptionContent-0-3-110']//li")
+            pts = self.driver.find_elements(By.XPATH, "//div[@class='jobDescriptionContent-0-3-121']//li")
             return list(map(lambda x: x.text, pts))
 
         for listing in self.listings:
