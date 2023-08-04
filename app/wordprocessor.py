@@ -11,9 +11,5 @@ class WordProcessor:
     def processData(self, data: list[list[str]]):
         flattenedData = [point for lst in data for point in lst]
         return list(map(self.processPoint, flattenedData))
-s = WordProcessor()
-test = [['The for construct iterates over the items in iterable', "while expression(item) provides"],
-        ['Note that comprehensions can also have nested for clauses and conditional statements']]
-print(s.processData(test))
 
 

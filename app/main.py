@@ -3,6 +3,7 @@ from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.core.utils import ChromeType
 import scraper
+from wordprocessor import WordProcessor
 from multiprocessing import Process
 
 if __name__ == '__main__':
@@ -74,4 +75,8 @@ if __name__ == '__main__':
     glProcess.join()
     liProcess.join()
     nfProcess.join()
+    s = WordProcessor()
+    test = [['The for construct iterates over the items in iterable', "while expression(item) provides"],
+            ['Note that comprehensions can also have nested for clauses and conditional statements']]
+    print(s.processData(test))
     print("DONE")
