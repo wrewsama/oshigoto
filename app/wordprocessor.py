@@ -1,3 +1,4 @@
+from collections import Counter
 import spacy
 
 class WordProcessor:
@@ -8,8 +9,15 @@ class WordProcessor:
         doc = self.nlp(text) 
         return [chunk.text for chunk in doc.noun_chunks]
 
-    def processData(self, data: list[list[str]]):
-        flattenedData = [point for lst in data for point in lst]
-        return list(map(self.processPoint, flattenedData))
+    def processData(self, data: list[list[str]], count: int):
+        flattenedPoints = [point for lst in data for point in lst]
+        processedPoints = []
+        for pt in flattenedPoints:
+            processedPoints.extend(self.processPoint(pt))
+        
+        phraseCount = Counter(processedPoints)
+        return phraseCount.most_common(count)
+
+
 
 
