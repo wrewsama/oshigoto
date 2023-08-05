@@ -1,3 +1,4 @@
 env
 */__pycache__
 oshigotoapi/*/__pycache__
+oshigotoapi/db.sqlite3
