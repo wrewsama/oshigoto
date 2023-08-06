@@ -23,7 +23,7 @@ class Scraper(ABC):
         pass
 
     @abstractmethod
-    def search(self, query: str):
+    async def search(self, query: str):
         pass
 
     @abstractmethod
@@ -54,7 +54,7 @@ class NodeFlairScraper(Scraper):
             return 
         self.driver.get(f"https://nodeflair.com/jobs?query=&page=1&sort_by=relevant&countries%5B%5D={location.title()}")
     
-    def search(self, query:str):
+    async def search(self, query:str):
         searchbar = self.driver.find_element(By.XPATH, "//input[@class='react-autosuggest__input']")
         searchbar.send_keys(query)
         searchbar.send_keys(Keys.RETURN)
@@ -109,7 +109,7 @@ class LinkedinScraper(Scraper):
         countrySearchBar.send_keys(location)
 
     
-    def search(self, query:str):
+    async def search(self, query:str):
         searchBar = self.driver.find_element(By.XPATH, "//input[@id='job-search-bar-keywords']")
         searchBar.send_keys(query) 
         searchBar.send_keys(Keys.RETURN)
@@ -173,7 +173,7 @@ class GlintsScraper(Scraper):
         selectedCountry = countrySelect.find_element(By.XPATH, f".//li[contains(text(), '{location}')]")
         selectedCountry.click()
     
-    def search(self, query:str):
+    async def search(self, query:str):
         url = self.driver.current_url
         currSearchQueryIdx = url.index('&keyword=') + len('&keyword=')
         self.driver.get(url[:currSearchQueryIdx] + query)
@@ -235,7 +235,7 @@ class InternSgScraper(Scraper):
     def setLocation(self, location: str):
         pass
     
-    def search(self, query:str):
+    async def search(self, query:str):
         searchBar = self.driver.find_element(By.XPATH, "//input[@class='form-control form-control-sm']")
         searchBar.send_keys(query) 
         searchBar.send_keys(Keys.RETURN)
@@ -285,7 +285,7 @@ class GoogleScraper(Scraper):
     def setLocation(self, location: str):
         pass
     
-    def search(self, query:str):
+    async def search(self, query:str):
         searchbar = self.driver.find_element(By.ID, "hs-qsb")
         for _ in range(6):
             searchbar.send_keys(Keys.BACK_SPACE)

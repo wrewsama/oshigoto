@@ -4,6 +4,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.core.utils import ChromeType
 import app.scraper as scraper
 from app.wordprocessor import WordProcessor
+import asyncio
 
 class ScraperService:
     def __init__(self):
@@ -23,15 +24,15 @@ class ScraperService:
             self.googleScraper,
             self.nodeflairScraper,
             self.linkedinScraper,
-            # self.nodeflairScraper,
-            # self.glintsScraper,
-            # self.internSgScraper
+            self.glintsScraper,
+            self.internSgScraper
         ]
 
     # TODO: make scraper methods async
-    def search(self, query: str):
-        for scraper in self.scrapers:
-            scraper.search(query)
+    async def search(self, query: str):
+        async def searchAll():
+            await asyncio.gather(*[s.search(query) for s in self.scrapers])
+        await searchAll()
 
     def setLocation(self, location: str):
         for scraper in self.scrapers:
