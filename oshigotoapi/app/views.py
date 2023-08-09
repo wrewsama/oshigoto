@@ -15,3 +15,9 @@ def search(req):
     print("searching for: " + req.data["query"])
     svc.search(req.data["query"])
     return Response({"message": "ayo you love shiorin too?"})
+
+@api_view(['GET'])
+def getBasicInfo(req):
+    print("Getting Basic Info")
+    svc.getBasicInfo()
+    return Response({"message": "ayo you love shiorin too?"})

@@ -21,5 +21,6 @@ import app.views as views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('search/', views.search),
-    path('location/', views.setLocation)
+    path('location/', views.setLocation),
+    path('basicinfo/', views.getBasicInfo)
 ]

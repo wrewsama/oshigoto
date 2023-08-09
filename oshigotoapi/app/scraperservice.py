@@ -4,7 +4,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.core.utils import ChromeType
 import app.scraper as scraper
 from app.wordprocessor import WordProcessor
-from multiprocessing import Process
+from multiprocessing import Process, Manager
 from typing import Callable, Tuple
 
 class ScraperService:
@@ -15,6 +15,7 @@ class ScraperService:
             ChromeDriverManager(
                 chrome_type=ChromeType.CHROMIUM,
                 version='114.0.5735.90').install())
+        self.manager = Manager()
         
         self.googleScraper = scraper.GoogleScraper(options=globalOptions, service=globalService)
         self.nodeflairScraper = scraper.NodeFlairScraper(options=globalOptions, service=globalService)
@@ -46,3 +47,9 @@ class ScraperService:
     def setLocation(self, location: str):
         setFunction = lambda scraper: scraper.setLocation
         self._runAllInParallel(setFunction, (location, ))
+
+    def getBasicInfo(self):
+        returnDict = self.manager.dict()
+        getFunction = lambda scraper: scraper.getBasicInfo
+        self._runAllInParallel(getFunction, (returnDict, ))
+        print(returnDict)

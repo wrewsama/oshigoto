@@ -13,6 +13,7 @@ class Scraper(ABC):
     def __init__(self, options: Options, service: Service):
         self.driver
         self.listings
+        self.NAME: str
 
     @abstractmethod
     def _getListings(self):
@@ -27,7 +28,7 @@ class Scraper(ABC):
         pass
 
     @abstractmethod
-    def getBasicInfo(self):
+    def getBasicInfo(self, returnDict: dict):
         pass
 
     @abstractmethod
@@ -42,6 +43,7 @@ class NodeFlairScraper(Scraper):
         self.driver.get("https://nodeflair.com/jobs?query=&page=1&sort_by=relevant&countries%5B%5D=Singapore")
         self.driver.implicitly_wait(10)
         self.listings = self._getListings()
+        self.NAME = 'NodeFlair'
 
         self.VALID_COUNTRIES = {'Singapore', 'Malaysia', 'Phillipines', 'Indonesia', 'Vietnam', 'Thailand', 'Taiwan', 'India'}
 
@@ -59,9 +61,9 @@ class NodeFlairScraper(Scraper):
         searchbar.send_keys(query)
         searchbar.send_keys(Keys.RETURN)
 
+    def getBasicInfo(self, returnDict: dict):
         self.listings = self._getListings()
 
-    def getBasicInfo(self):
         res = []
         for listing in self.listings:
             title = listing.find_element(By.XPATH, ".//h2[@class='jobListingCardTitle-0-3-82']").text
@@ -73,7 +75,7 @@ class NodeFlairScraper(Scraper):
                 "link": link
             })
         
-        return res
+        returnDict[self.NAME] = res
 
     def getJobPoints(self):
         res = []
@@ -95,6 +97,7 @@ class LinkedinScraper(Scraper):
         self.driver.get("https://www.linkedin.com/jobs/search")
         self.driver.implicitly_wait(10)
         self.listings = self._getListings()
+        self.NAME = 'LinkedIn'
 
     def _getListings(self):
         activeListing = self.driver.find_element(By.XPATH, "//div[@class='base-card relative w-full hover:no-underline focus:no-underline base-card--link base-search-card base-search-card--link job-search-card job-search-card--active']")
@@ -113,9 +116,10 @@ class LinkedinScraper(Scraper):
         searchBar = self.driver.find_element(By.XPATH, "//input[@id='job-search-bar-keywords']")
         searchBar.send_keys(query) 
         searchBar.send_keys(Keys.RETURN)
+
+    def getBasicInfo(self, returnDict: dict):
         self.listings = self._getListings()
 
-    def getBasicInfo(self):
         res = []
         for listing in self.listings:
             title = listing.find_element(By.XPATH, ".//h3[@class='base-search-card__title']").text
@@ -126,7 +130,8 @@ class LinkedinScraper(Scraper):
                 "company": company,
                 "link": link
             })
-        return res
+
+        returnDict[self.NAME] = res
 
     def getJobPoints(self):
         # linkedin blocks headless browsers / non logged in users from accessing JDs
@@ -141,6 +146,7 @@ class GlintsScraper(Scraper):
         self.driver.implicitly_wait(10)
         self.listings = self._getListings()
 
+        self.NAME = 'Glints'
         self.VALID_COUNTRIES = {'Singapore',
                                 'Malaysia',
                                 'Phillipines',
@@ -178,9 +184,9 @@ class GlintsScraper(Scraper):
         currSearchQueryIdx = url.index('&keyword=') + len('&keyword=')
         self.driver.get(url[:currSearchQueryIdx] + query)
 
+    def getBasicInfo(self, returnDict: dict):
         self.listings = self._getListings()
 
-    def getBasicInfo(self):
         res = []
         for l in self.listings:
             listing = l[0]
@@ -193,7 +199,7 @@ class GlintsScraper(Scraper):
                 "link": link
             })
 
-        return res
+        returnDict[self.NAME] = res
 
     def getJobPoints(self):
         res = []
@@ -225,6 +231,7 @@ class InternSgScraper(Scraper):
         self.driver.get("https://www.internsg.com/jobs/")
         self.driver.implicitly_wait(10)
         self.listings = self._getListings()
+        self.NAME = 'InternSg'
 
     def _getListings(self):
         evenListings = self.driver.find_elements(By.XPATH, "//div[@class='ast-row list-even']")[:5]
@@ -239,9 +246,10 @@ class InternSgScraper(Scraper):
         searchBar = self.driver.find_element(By.XPATH, "//input[@class='form-control form-control-sm']")
         searchBar.send_keys(query) 
         searchBar.send_keys(Keys.RETURN)
+
+    def getBasicInfo(self, returnDict: dict):
         self.listings = self._getListings()
 
-    def getBasicInfo(self):
         res = []
         for listing in self.listings:
             title = listing.find_element(By.XPATH, "./div[2]/a").text
@@ -252,7 +260,7 @@ class InternSgScraper(Scraper):
                 "company": company,
                 "link": link
             })
-        return res
+        returnDict[self.NAME] = res
 
     def getJobPoints(self):
         res = []
@@ -278,6 +286,7 @@ class GoogleScraper(Scraper):
         self.driver.get("https://www.google.com/search?q=intern&oq=sof&gs_lcrp=EgZjaHJvbWUqBggBEEUYOzIGCAAQRRg5MgYIARBFGDsyBggCEEUYOzIbCAMQLhgUGK8BGMcBGIcCGIAEGJgFGJkFGJ4FMhAIBBAuGMcBGLEDGNEDGIAEMgYIBRBFGEEyBggGEEUYPDIGCAcQRRg80gEIMzkzNGowajSoAgCwAgA&sourceid=chrome&ie=UTF-8&ibp=htl;jobs&sa=X&ved=2ahUKEwjYisWp4bWAAxU03jgGHb7WBSQQutcGKAF6BAgQEAY&sxsrf=AB5stBgAC-3yVvfOy8LZiInlqREPBQWxKQ:1690697051757#fpstate=tldetail&htivrt=jobs&htidocid=PnKDBGYnYJAAAAAAAAAAAA%3D%3D")
         self.driver.implicitly_wait(10)
         self.listings = self._getListings()
+        self.NAME = 'Google'
 
     def _getListings(self):
         return self.driver.find_elements(By.XPATH, "//li[@class='iFjolb gws-plugins-horizon-jobs__li-ed']")
@@ -292,9 +301,9 @@ class GoogleScraper(Scraper):
         searchbar.send_keys(query)
         searchbar.send_keys(Keys.RETURN)
 
+    def getBasicInfo(self, returnDict: dict):
         self.listings = self._getListings()
 
-    def getBasicInfo(self):
         res = []
         for listing in self.listings:
             title = listing.find_element(By.XPATH, ".//div[@class='BjJfJf PUpOsf']").text
@@ -305,7 +314,7 @@ class GoogleScraper(Scraper):
                 "link": self.driver.current_url
             })
         
-        return res
+        returnDict[self.NAME] = res
 
     def getJobPoints(self):
         res = []
