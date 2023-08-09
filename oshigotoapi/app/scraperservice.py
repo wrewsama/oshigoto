@@ -5,6 +5,7 @@ from webdriver_manager.core.utils import ChromeType
 import app.scraper as scraper
 from app.wordprocessor import WordProcessor
 from multiprocessing import Process
+from typing import Callable, Tuple
 
 class ScraperService:
     def __init__(self):
@@ -27,17 +28,21 @@ class ScraperService:
             self.glintsScraper,
             self.internSgScraper
         ]
-
-    async def search(self, query: str):
+    def _runAllInParallel(self, fun: Callable, args: Tuple):
         processes = []
         for scraper in self.scrapers:
-            process = Process(target=scraper.search, args=(query,))
+            process = Process(target=fun(scraper), args=args)
             process.start()
             processes.append(process)
 
         while processes:
             processes.pop().join()
 
+
+    def search(self, query: str):
+        searchFunction = lambda scraper: scraper.search
+        self._runAllInParallel(searchFunction, (query, ))
+
     def setLocation(self, location: str):
-        for scraper in self.scrapers:
-            scraper.setLocation(location)
+        setFunction = lambda scraper: scraper.setLocation
+        self._runAllInParallel(setFunction, (location, ))

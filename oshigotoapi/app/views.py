@@ -1,5 +1,5 @@
 from rest_framework.response import Response
-from adrf.decorators import api_view
+from rest_framework.decorators import api_view
 from app.scraperservice import ScraperService
 
 svc = ScraperService()
@@ -11,7 +11,7 @@ def setLocation(req):
     return Response({"message": "ayo you love shiorin too?"})
 
 @api_view(['POST'])
-async def search(req):
+def search(req):
     print("searching for: " + req.data["query"])
-    await svc.search(req.data["query"])
+    svc.search(req.data["query"])
     return Response({"message": "ayo you love shiorin too?"})
