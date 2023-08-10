@@ -32,7 +32,7 @@ class Scraper(ABC):
         pass
 
     @abstractmethod
-    def getJobPoints(self):
+    def getJobPoints(self, returnDict: dict):
         pass
 
 class NodeFlairScraper(Scraper):
@@ -240,6 +240,7 @@ class InternSgScraper(Scraper):
 
 
     def setLocation(self, location: str):
+        # InternSG only serves singapore (obviously)
         pass
     
     def search(self, query:str):
@@ -293,6 +294,7 @@ class GoogleScraper(Scraper):
         return self.driver.find_elements(By.XPATH, "//li[@class='iFjolb gws-plugins-horizon-jobs__li-ed']")
     
     def setLocation(self, location: str):
+        # Google careers automatically selects your location
         pass
     
     def search(self, query:str):
