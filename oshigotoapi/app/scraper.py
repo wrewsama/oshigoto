@@ -77,7 +77,7 @@ class NodeFlairScraper(Scraper):
         
         returnDict[self.NAME] = res
 
-    def getJobPoints(self):
+    def getJobPoints(self, returnDict: dict):
         res = []
         def getCurrJobPoints():
             pts = self.driver.find_elements(By.XPATH, "//div[@class='jobDescriptionContent-0-3-121']//li")
@@ -87,7 +87,7 @@ class NodeFlairScraper(Scraper):
             listing.click()
             res.extend(getCurrJobPoints())
 
-        return res
+        returnDict[self.NAME] = res
 
 class LinkedinScraper(Scraper):
     def __init__(self, options: Options, service: Service):
@@ -133,9 +133,9 @@ class LinkedinScraper(Scraper):
 
         returnDict[self.NAME] = res
 
-    def getJobPoints(self):
+    def getJobPoints(self, returnDict: dict):
         # linkedin blocks headless browsers / non logged in users from accessing JDs
-        return []
+        pass
 
 class GlintsScraper(Scraper):
     def __init__(self, options: Options, service: Service):
@@ -201,7 +201,7 @@ class GlintsScraper(Scraper):
 
         returnDict[self.NAME] = res
 
-    def getJobPoints(self):
+    def getJobPoints(self, returnDict: dict):
         res = []
 
         def extractInfo():
@@ -221,7 +221,7 @@ class GlintsScraper(Scraper):
                 print('skipped element')
             self.driver.back()
         
-        return res
+        returnDict[self.NAME] = res
 
 class InternSgScraper(Scraper):
     def __init__(self, options: Options, service: Service):
@@ -262,7 +262,7 @@ class InternSgScraper(Scraper):
             })
         returnDict[self.NAME] = res
 
-    def getJobPoints(self):
+    def getJobPoints(self, returnDict: dict):
         res = []
 
         def extractInfo():
@@ -276,7 +276,8 @@ class InternSgScraper(Scraper):
             self.driver.get(link)
             extractInfo()
             self.driver.back()
-        return res
+
+        returnDict[self.NAME] = res
 
 class GoogleScraper(Scraper):
     def __init__(self, options: Options, service: Service):
@@ -316,7 +317,7 @@ class GoogleScraper(Scraper):
         
         returnDict[self.NAME] = res
 
-    def getJobPoints(self):
+    def getJobPoints(self, returnDict: dict):
         res = []
         def getCurrJobPoints():
             text = self.driver.find_element(By.XPATH, "//span[@class='HBvzbc']").get_attribute('innerText')
@@ -328,4 +329,4 @@ class GoogleScraper(Scraper):
             listing.click()
             res.extend(getCurrJobPoints())
 
-        return res
+        returnDict[self.NAME] = res
