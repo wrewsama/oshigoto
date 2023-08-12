@@ -52,4 +52,6 @@ class ScraperService:
         returnDict = self.manager.dict()
         getFunction = lambda scraper: scraper.getBasicInfo
         self._runAllInParallel(getFunction, (returnDict, ))
-        print(returnDict)
+        return returnDict
+
+    
