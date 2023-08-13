@@ -10,14 +10,20 @@ class WordProcessor:
         return [chunk.text for chunk in doc.noun_chunks]
 
     def processData(self, data: list[list[str]], count: int):
-        flattenedPoints = [point for lst in data for point in lst]
         processedPoints = []
-        for pt in flattenedPoints:
+        for pt in data:
             processedPoints.extend(self.processPoint(pt))
         
         phraseCount = Counter(processedPoints)
-        return phraseCount.most_common(count)
+        mostCommon = phraseCount.most_common(count)
 
-
+        res = []
+        for pair in mostCommon:
+            obj = {
+                'phrase': pair[0],
+                'count': pair[1]
+            }
+            res.append(obj)
+        return res
 
 
