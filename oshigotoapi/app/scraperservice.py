@@ -16,6 +16,7 @@ class ScraperService:
                 chrome_type=ChromeType.CHROMIUM,
                 version='114.0.5735.90').install())
         self.manager = Manager()
+        self.processor = WordProcessor()
         
         self.googleScraper = scraper.GoogleScraper(options=globalOptions, service=globalService)
         self.nodeflairScraper = scraper.NodeFlairScraper(options=globalOptions, service=globalService)
@@ -54,4 +55,12 @@ class ScraperService:
         self._runAllInParallel(getFunction, (returnDict, ))
         return returnDict
 
-    
+    def getTopJobPoints(self, count: int):
+        returnDict = self.manager.dict()
+        getFunction = lambda scraper: scraper.getJobPoints
+        self._runAllInParallel(getFunction, (returnDict, )) 
+        accumulatedPoints = []
+        for scraper in returnDict:
+            accumulatedPoints.extend(returnDict[scraper])
+        res = self.processor.processData(accumulatedPoints, count)
+        return res

@@ -20,7 +20,8 @@ if __name__ == '__main__':
         nodeflairScraper = scraper.NodeFlairScraper(options=globalOptions, service=globalService)
         nodeflairScraper.setLocation('Singapore')
         nodeflairScraper.search('software engineer intern')
-        nBasicInfo = nodeflairScraper.getBasicInfo(res)
+        # nBasicInfo = nodeflairScraper.getBasicInfo(res)
+        njobPoints = nodeflairScraper.getJobPoints(res)
         # nJobPoints = nodeflairScraper.getJobPoints()
         # print(f"NODEFLAIR JOB POINTS: {nJobPoints}")
 
@@ -61,20 +62,19 @@ if __name__ == '__main__':
     goProcess = Process(target=google)
 
     nfProcess.start()
-    liProcess.start()
-    glProcess.start()
-    inProcess.start()
-    goProcess.start()
+    # liProcess.start()
+    # glProcess.start()
+    # inProcess.start()
+    # goProcess.start()
 
-    goProcess.join()
-    inProcess.join()
-    glProcess.join()
-    liProcess.join()
+    # goProcess.join()
+    # inProcess.join()
+    # glProcess.join()
+    # liProcess.join()
     nfProcess.join()
 
-    print(res)
     s = WordProcessor()
-    test = [['The for construct iterates over the items in iterable', "while expression(item) provides"],
-            ['Note that comprehensions can also have nested for clauses and conditional statements']]
-    print(s.processData(test, 2))
+    test = res['NodeFlair']
+    print(res)
+    print(s.processData(test, 10))
     print("DONE")

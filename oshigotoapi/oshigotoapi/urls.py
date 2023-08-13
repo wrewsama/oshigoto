@@ -22,5 +22,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('search/', views.search),
     path('location/', views.setLocation),
-    path('basicinfo/', views.getBasicInfo)
+    path('basicinfo/', views.getBasicInfo),
+    path('jobpoints/', views.getTopJobPoints)
 ]

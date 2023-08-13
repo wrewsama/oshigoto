@@ -42,7 +42,6 @@ class NodeFlairScraper(Scraper):
         self.driver.set_window_size(1280, 720)
         self.driver.get("https://nodeflair.com/jobs?query=&page=1&sort_by=relevant&countries%5B%5D=Singapore")
         self.driver.implicitly_wait(10)
-        self.listings = self._getListings()
         self.NAME = 'NodeFlair'
 
         self.VALID_COUNTRIES = {'Singapore', 'Malaysia', 'Phillipines', 'Indonesia', 'Vietnam', 'Thailand', 'Taiwan', 'India'}
@@ -78,6 +77,8 @@ class NodeFlairScraper(Scraper):
         returnDict[self.NAME] = res
 
     def getJobPoints(self, returnDict: dict):
+        self.listings = self._getListings()
+
         res = []
         def getCurrJobPoints():
             pts = self.driver.find_elements(By.XPATH, "//div[@class='jobDescriptionContent-0-3-121']//li")
@@ -96,7 +97,6 @@ class LinkedinScraper(Scraper):
         self.driver.set_window_size(1280, 720)
         self.driver.get("https://www.linkedin.com/jobs/search")
         self.driver.implicitly_wait(10)
-        self.listings = self._getListings()
         self.NAME = 'LinkedIn'
 
     def _getListings(self):
@@ -144,7 +144,6 @@ class GlintsScraper(Scraper):
         self.driver.set_window_size(1280, 1080)
         self.driver.get("https://glints.com/sg/opportunities/jobs/explore?country=SG&locationName=All+Cities%2FProvinces&keyword=intern")
         self.driver.implicitly_wait(10)
-        self.listings = self._getListings()
 
         self.NAME = 'Glints'
         self.VALID_COUNTRIES = {'Singapore',
@@ -202,6 +201,8 @@ class GlintsScraper(Scraper):
         returnDict[self.NAME] = res
 
     def getJobPoints(self, returnDict: dict):
+        self.listings = self._getListings()
+
         res = []
 
         def extractInfo():
@@ -230,7 +231,6 @@ class InternSgScraper(Scraper):
         self.driver.set_window_size(1280, 720)
         self.driver.get("https://www.internsg.com/jobs/")
         self.driver.implicitly_wait(10)
-        self.listings = self._getListings()
         self.NAME = 'InternSg'
 
     def _getListings(self):
@@ -264,6 +264,8 @@ class InternSgScraper(Scraper):
         returnDict[self.NAME] = res
 
     def getJobPoints(self, returnDict: dict):
+        self.listings = self._getListings()
+
         res = []
 
         def extractInfo():
@@ -287,7 +289,6 @@ class GoogleScraper(Scraper):
         self.driver.set_window_size(1280, 720)
         self.driver.get("https://www.google.com/search?q=intern&oq=sof&gs_lcrp=EgZjaHJvbWUqBggBEEUYOzIGCAAQRRg5MgYIARBFGDsyBggCEEUYOzIbCAMQLhgUGK8BGMcBGIcCGIAEGJgFGJkFGJ4FMhAIBBAuGMcBGLEDGNEDGIAEMgYIBRBFGEEyBggGEEUYPDIGCAcQRRg80gEIMzkzNGowajSoAgCwAgA&sourceid=chrome&ie=UTF-8&ibp=htl;jobs&sa=X&ved=2ahUKEwjYisWp4bWAAxU03jgGHb7WBSQQutcGKAF6BAgQEAY&sxsrf=AB5stBgAC-3yVvfOy8LZiInlqREPBQWxKQ:1690697051757#fpstate=tldetail&htivrt=jobs&htidocid=PnKDBGYnYJAAAAAAAAAAAA%3D%3D")
         self.driver.implicitly_wait(10)
-        self.listings = self._getListings()
         self.NAME = 'Google'
 
     def _getListings(self):
@@ -320,6 +321,8 @@ class GoogleScraper(Scraper):
         returnDict[self.NAME] = res
 
     def getJobPoints(self, returnDict: dict):
+        self.listings = self._getListings()
+
         res = []
         def getCurrJobPoints():
             text = self.driver.find_element(By.XPATH, "//span[@class='HBvzbc']").get_attribute('innerText')
