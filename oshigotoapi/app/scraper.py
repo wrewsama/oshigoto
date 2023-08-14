@@ -57,6 +57,9 @@ class NodeFlairScraper(Scraper):
     
     def search(self, query:str):
         searchbar = self.driver.find_element(By.XPATH, "//input[@class='react-autosuggest__input']")
+        # I honestly don't know why clear() doesn't work here but it just doesn't lmao
+        for _ in range(50):
+            searchbar.send_keys(Keys.BACK_SPACE)
         searchbar.send_keys(query)
         searchbar.send_keys(Keys.RETURN)
 
@@ -114,6 +117,7 @@ class LinkedinScraper(Scraper):
     
     def search(self, query:str):
         searchBar = self.driver.find_element(By.XPATH, "//input[@id='job-search-bar-keywords']")
+        searchBar.clear()
         searchBar.send_keys(query) 
         searchBar.send_keys(Keys.RETURN)
 
@@ -245,6 +249,7 @@ class InternSgScraper(Scraper):
     
     def search(self, query:str):
         searchBar = self.driver.find_element(By.XPATH, "//input[@class='form-control form-control-sm']")
+        searchBar.clear()
         searchBar.send_keys(query) 
         searchBar.send_keys(Keys.RETURN)
 
@@ -300,8 +305,7 @@ class GoogleScraper(Scraper):
     
     def search(self, query:str):
         searchbar = self.driver.find_element(By.ID, "hs-qsb")
-        for _ in range(6):
-            searchbar.send_keys(Keys.BACK_SPACE)
+        searchbar.clear()
         searchbar.send_keys(query)
         searchbar.send_keys(Keys.RETURN)
 
