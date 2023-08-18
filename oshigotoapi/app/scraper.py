@@ -1,19 +1,30 @@
 from selenium import webdriver
-from selenium.common.exceptions import ElementClickInterceptedException
+from selenium.common.exceptions import ElementClickInterceptedException, NoSuchElementException
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from multiprocessing import Manager
 from abc import ABC, abstractmethod
 from time import sleep
 
 class Scraper(ABC):
 
-    @abstractmethod
     def __init__(self, options: Options, service: Service):
-        self.driver
-        self.listings
-        self.NAME: str
+        self.driver = webdriver.Chrome(service=service,
+                                options=options)
+        self.driver.set_window_size(1280, 720)
+        self.queryCache = Manager().dict()
+        self.BASE_URL = ""
+
+    def resetToBaseUrl(self):
+        print('resetting to baseurl')
+        print(f"base url: {self.BASE_URL}, query cache: {self.queryCache}")
+        self.driver.get(self.BASE_URL)
+        if 'location' in self.queryCache:
+            self.setLocation(self.queryCache['location'])
+        if 'query' in self.queryCache:
+            self.search(self.queryCache['query'])
 
     @abstractmethod
     def _getListings(self):
@@ -37,10 +48,9 @@ class Scraper(ABC):
 
 class NodeFlairScraper(Scraper):
     def __init__(self, options: Options, service: Service):
-        self.driver = webdriver.Chrome(service=service,
-                                options=options)
-        self.driver.set_window_size(1280, 720)
-        self.driver.get("https://nodeflair.com/jobs?query=&page=1&sort_by=relevant&countries%5B%5D=Singapore")
+        super().__init__(options, service)
+        self.BASE_URL = "https://nodeflair.com/jobs?query=&page=1&sort_by=relevant&countries%5B%5D=Singapore"
+        self.driver.get(self.BASE_URL)
         self.driver.implicitly_wait(10)
         self.NAME = 'NodeFlair'
 
@@ -53,9 +63,13 @@ class NodeFlairScraper(Scraper):
     def setLocation(self, location: str):
         if location.title() not in self.VALID_COUNTRIES:
             return 
-        self.driver.get(f"https://nodeflair.com/jobs?query=&page=1&sort_by=relevant&countries%5B%5D={location.title()}")
+
+        self.queryCache['location'] = location
+        query = self.queryCache['query'] if 'query' in self.queryCache else ""
+        self.driver.get(f"https://nodeflair.com/jobs?query={query}&page=1&sort_by=relevant&countries%5B%5D={location.title()}")
     
     def search(self, query:str):
+        self.queryCache['query'] = query
         searchbar = self.driver.find_element(By.XPATH, "//input[@class='react-autosuggest__input']")
         # I honestly don't know why clear() doesn't work here but it just doesn't lmao
         for _ in range(50):
@@ -92,13 +106,13 @@ class NodeFlairScraper(Scraper):
             res.extend(getCurrJobPoints())
 
         returnDict[self.NAME] = res
+        self.resetToBaseUrl()
 
 class LinkedinScraper(Scraper):
     def __init__(self, options: Options, service: Service):
-        self.driver = webdriver.Chrome(service=service,
-                                options=options)
-        self.driver.set_window_size(1280, 720)
-        self.driver.get("https://www.linkedin.com/jobs/search")
+        super().__init__(options, service)
+        self.BASE_URL = "https://www.linkedin.com/jobs/search"
+        self.driver.get(self.BASE_URL)
         self.driver.implicitly_wait(10)
         self.NAME = 'LinkedIn'
 
@@ -109,13 +123,15 @@ class LinkedinScraper(Scraper):
 
 
     def setLocation(self, location: str):
+        self.queryCache['location'] = location
         countrySearchBar = self.driver.find_element(By.XPATH, "//input[@id='job-search-bar-location']")
-        for _ in range(13):
-            countrySearchBar.send_keys(Keys.BACKSPACE)
+        countrySearchBar.clear()
         countrySearchBar.send_keys(location)
+        countrySearchBar.send_keys(Keys.RETURN)
 
     
     def search(self, query:str):
+        self.queryCache['query'] = query
         searchBar = self.driver.find_element(By.XPATH, "//input[@id='job-search-bar-keywords']")
         searchBar.clear()
         searchBar.send_keys(query) 
@@ -143,10 +159,9 @@ class LinkedinScraper(Scraper):
 
 class GlintsScraper(Scraper):
     def __init__(self, options: Options, service: Service):
-        self.driver = webdriver.Chrome(service=service,
-                                options=options)
-        self.driver.set_window_size(1280, 1080)
-        self.driver.get("https://glints.com/sg/opportunities/jobs/explore?country=SG&locationName=All+Cities%2FProvinces&keyword=intern")
+        super().__init__(options, service)
+        self.BASE_URL = "https://glints.com/sg/opportunities/jobs/explore?country=SG&locationName=All+Cities%2FProvinces&keyword=intern"
+        self.driver.get(self.BASE_URL)
         self.driver.implicitly_wait(10)
 
         self.NAME = 'Glints'
@@ -176,6 +191,7 @@ class GlintsScraper(Scraper):
         if location not in self.VALID_COUNTRIES:
             return
 
+        self.queryCache['location'] = location
         countryInput = self.driver.find_element(By.XPATH, "//div[@class='SelectStyle__SelectWrapper-sc-gv8n2w-1 driwsF select-inputwrapper']")
         countryInput.click()
         countrySelect = self.driver.find_element(By.XPATH, "//ul[@class='SelectStyle__SelectListWrapper-sc-gv8n2w-4 hNAXQP select-listbox']")
@@ -183,6 +199,7 @@ class GlintsScraper(Scraper):
         selectedCountry.click()
     
     def search(self, query:str):
+        self.queryCache['query'] = query
         url = self.driver.current_url
         currSearchQueryIdx = url.index('&keyword=') + len('&keyword=')
         self.driver.get(url[:currSearchQueryIdx] + query)
@@ -210,8 +227,11 @@ class GlintsScraper(Scraper):
         res = []
 
         def extractInfo():
-            readMoreBtn = self.driver.find_element(By.XPATH, "//button[contains(text(), 'Read More')]")
-            readMoreBtn.click()
+            try:
+                readMoreBtn = self.driver.find_element(By.XPATH, "//button[contains(text(), 'Read More')]")
+                readMoreBtn.click()
+            except NoSuchElementException:
+                pass
             desc = self.driver.find_element(By.XPATH, "//div[@class='public-DraftEditor-content']")
             pts = desc.find_elements(By.XPATH, ".//li//span[@data-text='true']")
             return list(map(lambda x: x.text, pts))
@@ -227,13 +247,13 @@ class GlintsScraper(Scraper):
             self.driver.back()
         
         returnDict[self.NAME] = res
+        self.resetToBaseUrl()
 
 class InternSgScraper(Scraper):
     def __init__(self, options: Options, service: Service):
-        self.driver = webdriver.Chrome(service=service,
-                                options=options)
-        self.driver.set_window_size(1280, 720)
-        self.driver.get("https://www.internsg.com/jobs/")
+        super().__init__(options, service)
+        self.BASE_URL = "https://www.internsg.com/jobs/"
+        self.driver.get(self.BASE_URL)
         self.driver.implicitly_wait(10)
         self.NAME = 'InternSg'
 
@@ -248,6 +268,7 @@ class InternSgScraper(Scraper):
         pass
     
     def search(self, query:str):
+        self.queryCache['query'] = query
         searchBar = self.driver.find_element(By.XPATH, "//input[@class='form-control form-control-sm']")
         searchBar.clear()
         searchBar.send_keys(query) 
@@ -286,13 +307,13 @@ class InternSgScraper(Scraper):
             self.driver.back()
 
         returnDict[self.NAME] = res
+        self.resetToBaseUrl()
 
 class GoogleScraper(Scraper):
     def __init__(self, options: Options, service: Service):
-        self.driver = webdriver.Chrome(service=service,
-                                options=options)
-        self.driver.set_window_size(1280, 720)
-        self.driver.get("https://www.google.com/search?q=intern&oq=sof&gs_lcrp=EgZjaHJvbWUqBggBEEUYOzIGCAAQRRg5MgYIARBFGDsyBggCEEUYOzIbCAMQLhgUGK8BGMcBGIcCGIAEGJgFGJkFGJ4FMhAIBBAuGMcBGLEDGNEDGIAEMgYIBRBFGEEyBggGEEUYPDIGCAcQRRg80gEIMzkzNGowajSoAgCwAgA&sourceid=chrome&ie=UTF-8&ibp=htl;jobs&sa=X&ved=2ahUKEwjYisWp4bWAAxU03jgGHb7WBSQQutcGKAF6BAgQEAY&sxsrf=AB5stBgAC-3yVvfOy8LZiInlqREPBQWxKQ:1690697051757#fpstate=tldetail&htivrt=jobs&htidocid=PnKDBGYnYJAAAAAAAAAAAA%3D%3D")
+        super().__init__(options, service)
+        self.BASE_URL = "https://www.google.com/search?q=intern&oq=sof&gs_lcrp=EgZjaHJvbWUqBggBEEUYOzIGCAAQRRg5MgYIARBFGDsyBggCEEUYOzIbCAMQLhgUGK8BGMcBGIcCGIAEGJgFGJkFGJ4FMhAIBBAuGMcBGLEDGNEDGIAEMgYIBRBFGEEyBggGEEUYPDIGCAcQRRg80gEIMzkzNGowajSoAgCwAgA&sourceid=chrome&ie=UTF-8&ibp=htl;jobs&sa=X&ved=2ahUKEwjYisWp4bWAAxU03jgGHb7WBSQQutcGKAF6BAgQEAY&sxsrf=AB5stBgAC-3yVvfOy8LZiInlqREPBQWxKQ:1690697051757#fpstate=tldetail&htivrt=jobs&htidocid=PnKDBGYnYJAAAAAAAAAAAA%3D%3D"
+        self.driver.get(self.BASE_URL)
         self.driver.implicitly_wait(10)
         self.NAME = 'Google'
 
@@ -304,6 +325,7 @@ class GoogleScraper(Scraper):
         pass
     
     def search(self, query:str):
+        self.queryCache['query'] = query
         searchbar = self.driver.find_element(By.ID, "hs-qsb")
         searchbar.clear()
         searchbar.send_keys(query)
@@ -339,3 +361,4 @@ class GoogleScraper(Scraper):
             res.extend(getCurrJobPoints())
 
         returnDict[self.NAME] = res
+        self.resetToBaseUrl()

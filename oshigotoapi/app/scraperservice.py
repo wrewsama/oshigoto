@@ -9,6 +9,7 @@ from typing import Callable, Tuple
 
 class ScraperService:
     def __init__(self):
+        print("SCRAPER SERVICE INITIALISING")
         globalOptions = Options()
         globalOptions.add_experimental_option("detach", True)
         globalService = Service(
