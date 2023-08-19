@@ -1,9 +1,8 @@
 <script setup lang="ts">
-  1 + 1
+import AppHeader from './components/AppHeader.vue'
 </script>
 
 <template>
-  hello world
-  <button>ugly ass button</button>
-  <button class="btn btn-primary">not so ugly ass button</button>
+    <AppHeader />
+    body
 </template>
