@@ -183,7 +183,7 @@ class GlintsScraper(Scraper):
         def extractLink(listing):
             return listing.find_element(By.XPATH, "./div/a").get_attribute('href')
         sleep(2)
-        listingsWithoutLinks = self.driver.find_elements(By.XPATH, "//div[@class='JobCardsc__JobcardContainer-sc-hmqj50-0 kWccWU CompactOpportunityCardsc__CompactJobCardWrapper-sc-dkg8my-0 kwAlsu compact_job_card']")[:10]
+        listingsWithoutLinks = self.driver.find_elements(By.XPATH, "//div[@class='JobCardsc__JobcardContainer-sc-hmqj50-0 iirqVR CompactOpportunityCardsc__CompactJobCardWrapper-sc-dkg8my-0 dwwanr compact_job_card']")[:10]
         sleep(2)
         return list(map(lambda l: [l, extractLink(l)], listingsWithoutLinks))
 
@@ -210,8 +210,8 @@ class GlintsScraper(Scraper):
         res = []
         for l in self.listings:
             listing = l[0]
-            title = listing.find_element(By.XPATH, ".//h3[@class='CompactOpportunityCardsc__JobTitle-sc-dkg8my-7 jJvzUD']").text
-            company = listing.find_element(By.XPATH, ".//span[@class='CompactOpportunityCardsc__CompanyLinkContainer-sc-dkg8my-10 bPZqe']").text
+            title = listing.find_element(By.XPATH, ".//h3[@class='CompactOpportunityCardsc__JobTitle-sc-dkg8my-7 hDhBMu']").text
+            company = listing.find_element(By.XPATH, ".//span[@class='CompactOpportunityCardsc__CompanyLinkContainer-sc-dkg8my-10 hMaaBr']").text
             link = l[1]
             res.append({
                 "title": title,

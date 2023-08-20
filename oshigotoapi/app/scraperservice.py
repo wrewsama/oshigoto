@@ -54,6 +54,11 @@ class ScraperService:
         returnDict = self.manager.dict()
         getFunction = lambda scraper: scraper.getBasicInfo
         self._runAllInParallel(getFunction, (returnDict, ))
+
+        for key in ("NodeFlair", "LinkedIn", "InternSg", "Glints", "Google"):
+            # handle cases where error occur within the thread
+            if key not in returnDict:
+                returnDict[key] = []
         return returnDict
 
     def getTopJobPoints(self, count: int):

@@ -2,6 +2,7 @@
 import JobDescription from './JobDescription.vue'
 import JobPoint from './JobPoint.vue'
 import { ref } from 'vue';
+import API from '../api/api'
 
 const role = ref("")
 const location = ref("")
@@ -12,9 +13,36 @@ const internSg = ref([])
 const google = ref([])
 const points = ref([])
 
+const loadData = () => {
+    API.getBasicInfo()
+    .then(res => {
+        console.log(res.data)
+        nodeFlair.value = res.data["NodeFlair"]
+        linkedIn.value = res.data["LinkedIn"]
+        google.value = res.data["Google"]
+        glints.value = res.data["Glints"]
+        internSg.value = res.data["InternSg"]
+        API.getJobPoints(20)
+        .then(res => {
+            points.value = res.data
+        })
+        .catch(e => console.error(e))
+    })
+    .catch(e => console.error(e))
+}
+
 const onSearchBtnClick = () => {
     console.log(`role: ${role.value}`)
     console.log(`location: ${location.value}`)
+    API.setLocation(location.value)
+    .then(() => {
+        API.search(role.value)
+        .then(() => {
+            loadData()
+        })
+        .catch(e => console.error(e))
+    })
+    .catch(e => console.error(e))
 }
 </script>
 
