@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const http = axios.create({
-	baseURL: "http://localhost:8000/",
+	baseURL: 'VUE_APP_SERVER_URL',
 	headers: {
 		"Content-type": "application/json;charset=UTF-8",
 	}

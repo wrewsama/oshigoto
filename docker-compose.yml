@@ -4,4 +4,6 @@ services:
       context: ./oshigoto
       dockerfile: Dockerfile
     ports:
-      - "8080:8080"
+      - "80:80"
+    environment:
+      - VUE_APP_SERVER_URL=http://localhost:8000/
