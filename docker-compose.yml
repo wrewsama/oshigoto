@@ -7,3 +7,7 @@ services:
       - "80:80"
     environment:
       - VUE_APP_SERVER_URL=http://localhost:8000/
+  backend:
+    build:
+      context: ./oshigotoapi
+      dockerfile: Dockerfile
