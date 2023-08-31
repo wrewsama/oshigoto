@@ -11,11 +11,16 @@ class ScraperService:
     def __init__(self):
         print("SCRAPER SERVICE INITIALISING")
         globalOptions = Options()
-        globalOptions.add_experimental_option("detach", True)
+        # globalOptions.add_experimental_option("detach", True)
+        globalOptions.add_argument("--headless")
+        globalOptions.add_argument("--no-sandbox")
+        globalOptions.add_argument("--disable-dev-shm-usage")
+
         globalService = Service(
             ChromeDriverManager(
                 chrome_type=ChromeType.CHROMIUM,
                 version='114.0.5735.90').install())
+
         self.manager = Manager()
         self.processor = WordProcessor()
         
